@@ -4,10 +4,15 @@
 
 #define MAXARGS   128
 
-int main() 
+int main(int argc, char **argv) 
 {
     char cmdline[MAXLINE]; /* Command line */
+	
+	lsh_loop();
+}
 
+void lsh_loop()
+{
     while (1) 
 	{
 		/* Read */
