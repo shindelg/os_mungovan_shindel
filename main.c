@@ -1,10 +1,5 @@
 /* $begin shellmain */
 /*#include "csapp.h" */
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
 #include "main.h"
 
 #define MAXARGS   128
@@ -98,5 +93,17 @@ int parseline(char *buf, char **argv)
 	argv[--argc] = NULL;
 
     return bg;
+}
+
+pid_t Fork(void)
+{
+	pid_t i = 0;
+	return(i);
+}
+
+
+void unix_error(char *msg)
+{
+	int i = 0;
 }
 /* $end parseline */
