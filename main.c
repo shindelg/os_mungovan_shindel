@@ -8,12 +8,15 @@ int main()
 {
     char cmdline[MAXLINE]; /* Command line */
 
-    while (1) {
-	/* Read */
-	printf("> ");                   
-	//Fgets(cmdline, MAXLINE, stdin); 
-	if (feof(stdin))
-	    exit(0);
+    while (1) 
+	{
+		/* Read */
+		printf("> ");                   
+		//Fgets(cmdline, MAXLINE, stdin); 
+		if (feof(stdin))
+		{
+	    	exit(0);
+		}
 	}
 }
 
@@ -93,12 +96,6 @@ int parseline(char *buf, char **argv)
 	argv[--argc] = NULL;
 
     return bg;
-}
-
-pid_t Fork(void)
-{
-	pid_t i = 0;
-	return(i);
 }
 
 
