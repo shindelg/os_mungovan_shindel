@@ -13,13 +13,13 @@ int main()
 
     while (1) {
 	/* Read */
-	printf("lsh> ");                   
-	fgets(cmdline, MAXLINE, stdin); 
-	if (feof(stdin))
+	printf("lsh> ");    // promt the user to write something               
+	fgets(cmdline, MAXLINE, stdin); 	// waits for input
+	if (feof(stdin)) // checks for end-of-file indicator
 	    exit(0);
 
 	/* Evaluate */
-	eval(cmdline);
+	eval(cmdline);  // passes input to eval
     } 
 }
 /* $end shellmain */
@@ -64,6 +64,9 @@ int builtin_command(char **argv)
 {
     if (!strcmp(argv[0], "quit")) /* quit command */
 	exit(0);  
+	if (!strcmp(argv[0], "stat"))
+		printf("%s\n", "stat called");
+		return 1;
     if (!strcmp(argv[0], "&"))    /* Ignore singleton & */
 	return 1;
     return 0;                     /* Not a builtin command */
