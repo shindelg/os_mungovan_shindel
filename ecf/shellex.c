@@ -14,7 +14,7 @@ int main()
     while (1) {
 	/* Read */
 	printf("> ");                   
-	Fgets(cmdline, MAXLINE, stdin); 
+	fgets(cmdline, MAXLINE, stdin); 
 	if (feof(stdin))
 	    exit(0);
 
@@ -39,7 +39,7 @@ void eval(char *cmdline)
 	return;   /* Ignore empty lines */
 
     if (!builtin_command(argv)) { 
-        if ((pid = Fork()) == 0) {   /* Child runs user job */
+        if ((pid = fork()) == 0) {   /* Child runs user job */
             if (execve(argv[0], argv, environ) < 0) {
                 printf("%s: Command not found.\n", argv[0]);
                 exit(0);
@@ -50,7 +50,8 @@ void eval(char *cmdline)
 	if (!bg) {
 	    int status;
 	    if (waitpid(pid, &status, 0) < 0)
-		unix_error("waitfg: waitpid error");
+			printf("%d %s", pid, "This was the unix error");
+		//unix_error("waitfg: waitpid error");
 	}
 	else
 	    printf("%d %s", pid, cmdline);
