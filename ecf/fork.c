@@ -1,4 +1,5 @@
 #include "csapp.h"
+#include "fork.h"
 
 /* $begin fork */
 /* $begin wasidefork */
