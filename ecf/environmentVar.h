@@ -7,4 +7,6 @@
 //Prints environment variables 
 void print_env();
 
-int main();
+void echo_var(char *envVar);
+
+int main(int argc, char **argv);
