@@ -1,12 +1,11 @@
 #include "environmentVar.h"
 
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
 	if(!strcmp(argv[1], "echo"))
 	{
 
 		//Call echo command passing variable to echo
-		printf("%s\n", "calling echo");
 		echo_var(argv);
 		exit(0);
 	}
@@ -20,7 +19,7 @@ int main(int argc, char **argv)
 
 void print_env()
 {
-	extern char** environ; 
+	extern char ** environ; 
 
 	int i = 0; 
 	while(environ[i])
@@ -32,33 +31,31 @@ void print_env()
 }
 
 
-void echo_var(char **envVar)
+int echo_var(char ** envVar)
 {
-	extern char** environ;
-	char *varCopy = envVar[2];
+	extern char ** environ;
+	char * varCopy = envVar[2];
 	//Print the variable value if it exists, blank if not
-	//O = False, 1 = True
-	int found = 0; 
 	int i = 0; 
-	char *token; 
-	char *environHold;
+	char copy[1000];
+	char * token;
+	char * environHold;
 	while(environ[i])
 	{
 		environHold = environ[i];
 		//Split the environment variable by =
-		token = strtok(environHold, "=");
-		if(!strcmp(token, envVar))
+		strcpy(copy, environHold);
+		token = strtok(copy, "=");
+
+		if(!strcmp(token, varCopy))
 		{
-			found = 1; 
-			printf("%s\n", token);
-			break;
-		}
+			printf("%s\n", environHold);
+			return(1);
+		}		
 		//If the first value = the input envVar, print, else continue
 		i++;
 	}
 
-	if(!found)
-	{
-		printf("%s\n", "");
-	}
+	printf("%s\n", "");
+	return(1);
 } 
