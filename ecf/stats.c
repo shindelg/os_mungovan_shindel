@@ -27,12 +27,20 @@ int parse_stats(char **argv){
 			getrusage (RUSAGE_SELF, &usage);
 			printf("Involuntary context switches: %ld\n", usage.ru_nivcsw);					
 		}
+		// Do all of the stats
 		if (!strcmp(argv[i], "a")){
-			getrusage (RUSAGE_SELF, &usage);		
+			getrusage (RUSAGE_SELF, &usage);	
+ 			printf ("CPU time: %ld.%06ld sec user\n", usage.ru_utime.tv_sec, usage.ru_utime.tv_usec);	
+			printf("CPU time: %ld.%06ld sec system\n", usage.ru_stime.tv_sec, usage.ru_stime.tv_usec); 		
+			printf("Hard page faults: %ld\n", usage.ru_majflt);				
+			printf("Voluntary context switches: %ld\n", usage.ru_nvcsw);
+			printf("Involuntary context switches: %ld\n", usage.ru_nivcsw);
 		}
+		// Is this just showing all options or just ones that have been enabled?
 		if (!strcmp(argv[i], "l")){
-					
+			printf(" Enabled Stats: \n CPU User Time \n CPU Kernal Time \n Hard Page Faults \n Voluntary Context Switches \n Involuntary Context Switches \n");
 		}
+		// reset all
 		if (!strcmp(argv[i], "c")){
 			
 		}

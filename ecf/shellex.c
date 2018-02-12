@@ -2,6 +2,7 @@
 #include "../include/csapp.h"
 #include "stats.h"
 #include "stats.c"
+#include "man.c"
 
 #define MAXARGS   128
 
@@ -66,7 +67,9 @@ void eval(char *cmdline)
 int builtin_command(char **argv) 
 {
     if (!strcmp(argv[0], "quit")) /* quit command */
-	exit(0);  
+		exit(0);  
+	if (!strcmp(argv[0], "man"))
+		print_man();
 	if (!strcmp(argv[0], "stat"))
 		// pass argv[1] +... argv[n] to stat function
 		parse_stats(argv);

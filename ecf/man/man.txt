@@ -1,0 +1,8 @@
+/*************************************/
+This is a test man page.
+
+Its in the format of a text file.
+
+
+It may not remain in this state, may become a formal man page using troff.
+/*************************************/
