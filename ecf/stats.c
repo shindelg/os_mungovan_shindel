@@ -5,17 +5,36 @@ int parse_stats(char **argv){
 	int i = 1;
 	while(argv[i] != NULL){
 		// either if-else or switch statement for all commands
-		
+		struct rusage usage;
 		if (!strcmp(argv[i], "u")){
-			struct rusage usage;
- 			getrusage (RUSAGE_SELF, &usage);
+			getrusage (RUSAGE_SELF, &usage);
  			printf ("CPU time: %ld.%06ld sec user\n", usage.ru_utime.tv_sec, usage.ru_utime.tv_usec);
 		}
 
 		if (!strcmp(argv[i], "s")){
-			struct rusage usage;
  			getrusage (RUSAGE_SELF, &usage);
 			printf("CPU time: %ld.%06ld sec system\n", usage.ru_stime.tv_sec, usage.ru_stime.tv_usec);
+		}
+		if (!strcmp(argv[i], "p")){
+			getrusage (RUSAGE_SELF, &usage);
+			printf("Hard page faults: %ld\n", usage.ru_majflt);
+		}
+		if (!strcmp(argv[i], "v")){
+			getrusage (RUSAGE_SELF, &usage);
+			printf("Voluntary context switches: %ld\n", usage.ru_nvcsw);
+		}
+		if (!strcmp(argv[i], "i")){
+			getrusage (RUSAGE_SELF, &usage);
+			printf("Involuntary context switches: %ld\n", usage.ru_nivcsw);					
+		}
+		if (!strcmp(argv[i], "a")){
+			getrusage (RUSAGE_SELF, &usage);		
+		}
+		if (!strcmp(argv[i], "l")){
+					
+		}
+		if (!strcmp(argv[i], "c")){
+			
 		}
 
 		i++;	
