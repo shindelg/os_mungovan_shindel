@@ -2,10 +2,12 @@
 
 int main(int argc, char **argv)
 {
-	if(!strcmp(argv[0], "echo"))
+	if(!strcmp(argv[1], "echo"))
 	{
+
 		//Call echo command passing variable to echo
-		//echo_var(char *argv[2]);
+		printf("%s\n", "calling echo");
+		echo_var(argv);
 		exit(0);
 	}
 	else
@@ -30,10 +32,10 @@ void print_env()
 }
 
 
-void echo_var(char *envVar)
+void echo_var(char **envVar)
 {
 	extern char** environ;
-	char *varCopy = envVar;
+	char *varCopy = envVar[2];
 	//Print the variable value if it exists, blank if not
 	//O = False, 1 = True
 	int found = 0; 
