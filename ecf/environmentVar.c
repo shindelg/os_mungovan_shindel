@@ -35,6 +35,11 @@ int echo_var(char ** envVar)
 {
 	extern char ** environ;
 	char * varCopy = envVar[2];
+	//remove $ from beginning of var to find. 
+	//ex: $PATH to find PATH variable, search using PATH
+	if(varCopy[0] == '$')
+		memmove(varCopy, varCopy + 1, strlen(varCopy));
+	
 	//Print the variable value if it exists, blank if not
 	int i = 0; 
 	char copy[1000];
