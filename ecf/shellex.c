@@ -1,5 +1,8 @@
 /* $begin shellmain */
 #include "../include/csapp.h"
+#include "stats.h"
+#include "stats.c"
+
 #define MAXARGS   128
 
 /* Function prototypes */
@@ -65,7 +68,8 @@ int builtin_command(char **argv)
     if (!strcmp(argv[0], "quit")) /* quit command */
 	exit(0);  
 	if (!strcmp(argv[0], "stat"))
-		printf("%s\n", "stat called");
+		// pass argv[1] +... argv[n] to stat function
+		parse_stats(argv);
 		return 1;
     if (!strcmp(argv[0], "&"))    /* Ignore singleton & */
 	return 1;
@@ -106,5 +110,4 @@ int parseline(char *buf, char **argv)
     return bg;
 }
 /* $end parseline */
-
 
