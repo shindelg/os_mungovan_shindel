@@ -68,15 +68,20 @@ int builtin_command(char **argv)
 {
     if (!strcmp(argv[0], "quit")) /* quit command */
 		exit(0);  
-	if (!strcmp(argv[0], "man"))
+	else if (!strcmp(argv[0], "man")){
 		print_man();
-	if (!strcmp(argv[0], "stat"))
-		// pass argv[1] +... argv[n] to stat function
+		return 1;
+	}
+	else if (!strcmp(argv[0], "stat")){
 		parse_stats(argv);
 		return 1;
-    if (!strcmp(argv[0], "&"))    /* Ignore singleton & */
-	return 1;
-    return 0;                     /* Not a builtin command */
+	}
+    else if (!strcmp(argv[0], "&")){
+		return 1;
+	}
+    else{
+    	return 0;                     /* Not a builtin command */
+    }
 }
 /* $end eval */
 

@@ -23,6 +23,7 @@ void print_man(){
         printf ("%c", c);
         c = fgetc(fptr);
     }
+    printf("\n");
  
     fclose(fptr);
 }
