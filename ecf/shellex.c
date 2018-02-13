@@ -70,7 +70,6 @@ int builtin_command(char **argv)
 		return 1;
     if(!strcmp(argv[0], "printenv"))
         printf("%s\n", "print environment variables");
-        //print_env();
         return(1);
     if (!strcmp(argv[0], "&"))    /* Ignore singleton & */
 	return 1;
