@@ -5,12 +5,15 @@ int parse_stats(char **argv){
 	int i = 1;
 	while(argv[i] != NULL){
 		// either if-else or switch statement for all commands
+		/*
 		if(!strcmp(argv[i], "-xxx", 1)){
 			printf("%s\n", "it worked");
 		}
 		else{
 			printf("%c\n", argv[i][0]);
 		}
+		*/
+		
 		struct rusage usage;
 
 		if (!strcmp(argv[i], "u")){
