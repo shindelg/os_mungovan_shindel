@@ -3,6 +3,7 @@
 #include "stats.h"
 #include "stats.c"
 #include "man.c"
+#include "signal.h"
 
 #define MAXARGS   128
 
@@ -10,10 +11,13 @@
 void eval(char *cmdline);
 int parseline(char *buf, char **argv);
 int builtin_command(char **argv); 
+void signal_handler(int);
 
 int main() 
 {
     char cmdline[MAXLINE]; /* Command line */
+
+	signal(SIGINT, INThandler);
 
     while (1) {
 	/* Read */
@@ -28,6 +32,12 @@ int main()
 }
 /* $end shellmain */
   
+void  signal_handler(int sig)
+{
+     signal(sig, SIG_IGN);
+     printf("OUCH, did you hit Ctrl-C?");
+}
+
 /* $begin eval */
 /* eval - Evaluate a command line */
 void eval(char *cmdline) 
@@ -44,10 +54,15 @@ void eval(char *cmdline)
 
     if (!builtin_command(argv)) { 
         if ((pid = fork()) == 0) {   /* Child runs user job */
+    		/*
             if (execve(argv[0], argv, environ) < 0) {
-                printf("%s: Command not found.\n", argv[0]);
                 exit(0);
             }
+            */
+          if (execvp(*argv, argv) < 0) {     // run inheruted linux commands 
+               printf("%s: Command not found.\n", argv[0]);
+               exit(0);
+          }    	
         }
 
 	/* Parent waits for foreground job to terminate */
@@ -62,6 +77,25 @@ void eval(char *cmdline)
     }
     return;
 }
+     /*
+     pid_t  pid;
+     int    status;
+     
+     if ((pid = fork()) < 0) {     // fork a child process           
+          printf("*** ERROR: forking child process failed\n");
+          exit(1);
+     }
+     else if (pid == 0) {          // for the child process:         
+          if (execvp(*argv, argv) < 0) {     // execute the command  
+               printf("*** ERROR: exec failed\n");
+               exit(1);
+          }
+     }
+     else {                                  // for the parent:      
+          while (wait(&status) != pid)       // wait for completion  
+               ;
+     }
+     */
 
 /* If first arg is a builtin command, run it and return true */
 int builtin_command(char **argv) 
