@@ -64,16 +64,60 @@ void eval(char *cmdline)
 int builtin_command(char **argv) 
 {
     if (!strcmp(argv[0], "quit")) /* quit command */
-	exit(0);  
-	if (!strcmp(argv[0], "stat"))
-		printf("%s\n", "stat called");
+    {
+	   exit(0);  
+    }
+	else if (!strcmp(argv[0], "stat"))
+    {
 		return 1;
-    if(!strcmp(argv[0], "printenv"))
+    }
+    else if(!strcmp(argv[0], "printenv"))
+    {
         printf("%s\n", "print environment variables");
+        print_env(argv);
         return(1);
-    if (!strcmp(argv[0], "&"))    /* Ignore singleton & */
-	return 1;
-    return 0;                     /* Not a builtin command */
+    }
+    //Split argv[1] based on =, if it contains it then the user is trying to 
+    //modify an environmental variable
+    else if (split_str(argv[0]))
+    {
+        char * copyOfArgv; 
+        char * cutArgv; 
+        strcpy(copyOfArgv, argv[0]);
+
+        
+        cutArgv = split_str(copyOfArgv);
+        //If user trying to create an environmental variable. 
+        int cutArgLength = strlen(&cutArgv);
+        int originalArgLength =  strlen(&argv[0]);
+
+        if(!(cutArgLength + 1 == originalArgLength + 1))
+        {
+            set_env_var(argv);
+            return(1);
+        }
+        //If the user is trying to remove an environmental variable. 
+        else
+        {
+            remove_env_var(argv);
+            return(1);
+        } 
+        printf("%s\n", "inside add / remove");
+        return(1);
+    }
+    else if(!strcmp(argv[0], "echo"))
+    {
+        echo_var(argv);
+        return(1);
+    }
+    else if (!strcmp(argv[0], "&"))    /* Ignore singleton & */
+    {
+	   return 1;
+    }
+    else
+    {
+        return 0; /* Not a builtin command */
+    }                     
 }
 /* $end eval */
 

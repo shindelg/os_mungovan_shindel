@@ -1,6 +1,6 @@
 #include "environmentVar.h"
 
-int main(int argc, char ** argv)
+/*int main(int argc, char ** argv)
 {
 	if(!strcmp(argv[1], "echo"))
 	{
@@ -15,19 +15,96 @@ int main(int argc, char ** argv)
 		exit(0);
 	}
 	return 0;
-}
+}*/
 
-void print_env()
+void print_env(char ** argv)
 {
-	extern char ** environ; 
 
-	int i = 0; 
-	while(environ[i])
+	pid_t pid;
+	int status; 
+
+	pid = fork();
+	if(pid == 0) // If the child
 	{
-		printf("%s\n", environ[i]);
-		i++;
+		printf("%s", "argv[0]: ");
+		printf("%s\n", argv[0]);
+
+		status = execvp(*argv, argv);
+
+		if(status < 0)
+		{
+			printf("%s", "Unable to call system command: " );
+			printf("%s\n", argv[0]);
+			exit(0);
+		}
+	}
+	else
+	{
+		//In parent process, wait for child to finish.
+		if (waitpid(pid, &status, 0) < 0)
+			printf("%d %s", pid, "This was the unix error");
+		return;
 	}
 
+	return;
+
+}
+
+void set_env_var(char ** argv)
+{
+	int i = 0; 
+	pid_t pid;
+	int status; 
+	char varNameHold[1000];
+	char varValueHold[1000];
+	
+	//Split the environment variable by =
+	strcpy(varNameHold, &argv[0]);
+	//strcpy(varValueHold, argv[0]);
+
+	
+	char * argumentsForExec[3];
+	
+	argumentsForExec[0] = "export";
+	argumentsForExec[1] = varNameHold;
+	argumentsForExec[2] = NULL;
+
+	
+	pid = fork();
+	if(pid == 0) // If the child
+	{
+
+		status = execvp(*argumentsForExec, argumentsForExec);
+
+		if(status < 0)
+		{
+			printf("%s", "Unable to call system command: " );
+			printf("%s\n", argv[0]);
+			exit(0);
+		}
+	}
+	else
+	{
+		//In parent process, wait for child to finish.
+		if (waitpid(pid, &status, 0) < 0)
+			printf("%d %s", pid, "This was the unix error");
+		return;
+	} 
+
+	return;
+
+	/*
+	//Split the string before =
+	//set that to be the variable name to add to the environment
+	varNameHold = strtok(copy, "=");
+
+	if(!strcmp(token, varCopy))
+	{
+		printf("%s\n", stringHold);
+		return(1);
+	}		
+	//If the first value = the input envVar, print, else continue
+	i++; */
 }
 
 
@@ -38,24 +115,39 @@ void echo_var(char ** argv)
 
 	//extern char ** environ;
 	
-	char * varCopy = argv[2];
+	char * varCopy;
+	//If no environmental variable following echo
+	if(argv[1] == NULL)
+	{
+		printf("%s\n", "Echo requires two arguments");
+		return;
+	}
 	//remove $ from beginning of var to find. 
 	//ex: $PATH to find PATH variable, search using PATH
-	if(varCopy[0] == '$') // should this be strcmp???
+	
+	/*
+	if(varCopy[1] == '$' && !(varCopy == NULL)) // should this be strcmp???
 		//printf("%s\n", varCopy);
 		memmove(varCopy, varCopy + 1, strlen(varCopy));
-		argv[2] = varCopy;
+		argv[1] = varCopy; */
 	
 	//printf("%s\n", "calling execvp");
+
 	pid = fork();
 	if(pid == 0) // If the child
 	{
-		status = execvp(argv[1], argv);
+		printf("%s", "argv[0]: ");
+		printf("%s\n", argv[0]);
+
+		printf("%s", "argv[1]: ");
+		printf("%s\n", argv[1]);
+
+		status = execvp(*argv, argv);
 
 		if(status < 0)
 		{
 			printf("%s", "Unable to call system command: " );
-			printf("%s\n", argv[2]);
+			printf("%s\n", argv[0]);
 			exit(0);
 		}
 	}
@@ -94,3 +186,19 @@ void echo_var(char ** argv)
 	printf("%s\n", "");
 	return(1); */
 } 
+
+void remove_env_var(char ** argv)
+{
+	return;
+}
+
+char * split_str(char * string)
+{
+	char * retString;
+
+	retString = strtok(string, "=");
+
+	return(retString);
+
+
+}

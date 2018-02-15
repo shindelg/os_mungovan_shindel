@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <string.h>
 #include "environmentVar.h"
+#include "environmentVar.c"
 #include "fork.h"
 #include "../include/csapp.h"
 
