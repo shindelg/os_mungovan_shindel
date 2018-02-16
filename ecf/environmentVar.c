@@ -52,7 +52,6 @@ void print_env(char ** argv)
 
 void set_env_var(char ** argv)
 {
-	int i = 0; 
 	pid_t pid;
 	int status; 
 	char varNameHold[1000];
@@ -107,6 +106,48 @@ void set_env_var(char ** argv)
 	i++; */
 }
 
+void remove_env_var(char ** argv)
+{
+	pid_t pid;
+	int status; 
+
+	char varNameHold[1000];
+	char varValueHold[1000];
+	
+	//Split the environment variable by =
+	strcpy(varNameHold, &argv[0]);
+	
+	char * argumentsForExec[3];
+	
+	argumentsForExec[0] = "unset";
+	argumentsForExec[1] = varNameHold;
+	argumentsForExec[2] = NULL;
+
+	
+	pid = fork();
+	if(pid == 0) // If the child
+	{
+
+		status = execvp(*argumentsForExec, argumentsForExec);
+
+		if(status < 0)
+		{
+			printf("%s", "Unable to call system command: " );
+			printf("%s\n", argv[0]);
+			exit(0);
+		}
+	}
+	else
+	{
+		//In parent process, wait for child to finish.
+		if (waitpid(pid, &status, 0) < 0)
+			printf("%d %s", pid, "This was the unix error");
+		return;
+	} 
+
+	return;
+	return;
+}
 
 void echo_var(char ** argv)
 {
@@ -186,11 +227,6 @@ void echo_var(char ** argv)
 	printf("%s\n", "");
 	return(1); */
 } 
-
-void remove_env_var(char ** argv)
-{
-	return;
-}
 
 char * split_str(char * string)
 {

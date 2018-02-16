@@ -91,6 +91,8 @@ int builtin_command(char **argv)
         int cutArgLength = strlen(&cutArgv);
         int originalArgLength =  strlen(&argv[0]);
 
+        //split the string by =, compare the lengths
+        //if the string is varName=
         if(!(cutArgLength + 1 == originalArgLength + 1))
         {
             set_env_var(argv);
