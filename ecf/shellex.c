@@ -73,12 +73,11 @@ int builtin_command(char ** argv)
     }
     else if(!strcmp(argv[0], "printenv"))
     {
-        printf("%s\n", "print environment variables");
         print_env(argv);
         return(1);
     }
     //if the input contains =, then user trying to modify environmental var. 
-    else if ((strchr(argv[0],'=')))
+    else if(strchr(argv[0],'='))
     {   
         modify_env_var(argv);
         return(1);

@@ -1,22 +1,4 @@
 #include "environmentVar.h"
-
-/*int main(int argc, char ** argv)
-{
-	if(!strcmp(argv[1], "echo"))
-	{
-
-		//Call echo command passing variable to echo
-		echo_var(argv);
-		exit(0);
-	}
-	else
-	{
-		print_env();
-		exit(0);
-	}
-	return 0;
-}*/
-
 void print_env(char ** argv)
 {
 
@@ -88,65 +70,45 @@ void modify_env_var(char ** argv)
 
 }
 
-/*
-void remove_env_var(char ** argv)
+void echo_var(char ** argv)
 {
 	char * variableName;
 
-	variableName = malloc(sizeof(char) * strlen(argv[0]));
+	char * variableValue;
 
-	split_str(variableName);
-
-	unsetenv(variableName);
-
-	free(variableName);
-
-	return;
-
-	printf("%s\n", "called remove");
-	pid_t pid;
-	int status; 
-
-	char varNameHold[1000];
-	char varValueHold[1000];
-	
-	//Split the environment variable by =
-	strcpy(varNameHold, &argv[0]);
-	
-	char * argumentsForExec[3];
-	
-	argumentsForExec[0] = "unset";
-	argumentsForExec[1] = varNameHold;
-	argumentsForExec[2] = NULL;
-
-	
-	pid = fork();
-	if(pid == 0) // If the child
+	//If variable is $PWD, remove $
+	if(strchr(argv[1],'$'))
 	{
+		variableName = malloc(sizeof(char) * (strlen(argv[1] -1)));
+		argv[1]++;
 
-		status = execvp(*argumentsForExec, argumentsForExec);
-
-		if(status < 0)
-		{
-			printf("%s", "Unable to call system command: " );
-			printf("%s\n", argv[0]);
-			exit(0);
-		}
 	}
 	else
 	{
-		//In parent process, wait for child to finish.
-		if (waitpid(pid, &status, 0) < 0)
-			printf("%d %s", pid, "This was the unix error");
-		return;
-	} 
+		variableName = malloc(sizeof(char) * strlen(argv[1]));
+	}
 
-	
-	return;
-} */
+    strcpy(variableName,argv[1]);
 
-void echo_var(char ** argv)
-{
+    variableValue = getenv(variableName);
+
+    if(variableValue)
+    {
+    	printf("%s", variableName);
+    	printf("%s", "=");
+    	printf("%s\n", variableValue);
+    }
+    else
+    {
+    	printf("%s", "Variable: ");
+    	printf("%s", variableName);
+    	printf("%s\n", " not found in environment.");
+    }
+
+    return;
+
+
+	/*
 	pid_t pid;
 	int status; 
 
@@ -162,11 +124,11 @@ void echo_var(char ** argv)
 	//remove $ from beginning of var to find. 
 	//ex: $PATH to find PATH variable, search using PATH
 	
-	/*
+	
 	if(varCopy[1] == '$' && !(varCopy == NULL)) // should this be strcmp???
 		//printf("%s\n", varCopy);
 		memmove(varCopy, varCopy + 1, strlen(varCopy));
-		argv[1] = varCopy; */
+		argv[1] = varCopy; 
 	
 	//printf("%s\n", "calling execvp");
 
