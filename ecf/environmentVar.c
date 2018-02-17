@@ -50,11 +50,8 @@ void print_env(char ** argv)
 
 }
 
-void set_env_var(char ** argv)
+void modify_env_var(char ** argv)
 {
-
-	pid_t pid;
-	int status;
 	int splitIndex; 
 	char * variableName;
 	char * variableValue;
@@ -74,14 +71,38 @@ void set_env_var(char ** argv)
 	//split str by = 
 	split_str(variableName);
 
-	setenv(variableName,variableValue,1);
+	//If the variable value is only =, then remove the variable
+	if(strchr(variableValue,'='))
+	{
+		unsetenv(variableName);
+	}
+	//else add the variable into the environment
+	else
+	{
+		setenv(variableName,variableValue,1);
+	}
 
+	free(variableName);
+	free(variableValue);
 	return;
 
 }
 
+/*
 void remove_env_var(char ** argv)
 {
+	char * variableName;
+
+	variableName = malloc(sizeof(char) * strlen(argv[0]));
+
+	split_str(variableName);
+
+	unsetenv(variableName);
+
+	free(variableName);
+
+	return;
+
 	printf("%s\n", "called remove");
 	pid_t pid;
 	int status; 
@@ -120,9 +141,9 @@ void remove_env_var(char ** argv)
 		return;
 	} 
 
+	
 	return;
-	return;
-}
+} */
 
 void echo_var(char ** argv)
 {

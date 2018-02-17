@@ -79,32 +79,8 @@ int builtin_command(char ** argv)
     }
     //if the input contains =, then user trying to modify environmental var. 
     else if ((strchr(argv[0],'=')))
-    {
-        
-        char * copyOfArgv; 
-        char * cutArgv; 
-
-        copyOfArgv = malloc(sizeof(char) * strlen(argv[0]));
-        strcpy(copyOfArgv,argv[0]);
-
-        cutArgv = split_str(copyOfArgv);
-        //If user trying to create an environmental variable. 
-        int cutArgLength = strlen(&cutArgv);
-        int originalArgLength =  strlen(&argv[0]); 
-
-        //split the string by =, compare the lengths
-        //if the string is varName=
-        if(!(copyOfArgv + 1 == originalArgLength + 1))
-        {
-            set_env_var(argv);
-            return(1);
-        }
-        //If the user is trying to remove an environmental variable. 
-        else
-        {
-            remove_env_var(argv);
-            return(1);
-        } 
+    {   
+        modify_env_var(argv);
         return(1);
     }
     else if(!strcmp(argv[0], "echo"))

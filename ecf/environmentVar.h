@@ -10,7 +10,7 @@ void print_env(char ** argv);
 
 void echo_var(char ** argv);
 
-void set_env_var(char ** argv);
+void modify_env_var(char ** argv);
 
 void remove_env_var(char ** argv);
 
