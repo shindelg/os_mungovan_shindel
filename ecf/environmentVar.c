@@ -52,62 +52,37 @@ void print_env(char ** argv)
 
 void set_env_var(char ** argv)
 {
+
 	pid_t pid;
-	int status; 
-	char varNameHold[1000];
-	char varValueHold[1000];
-	
-	//Split the environment variable by =
-	strcpy(varNameHold, &argv[0]);
-	//strcpy(varValueHold, argv[0]);
+	int status;
+	int splitIndex; 
+	char * variableName;
+	char * variableValue;
 
-	
-	char * argumentsForExec[3];
-	
-	argumentsForExec[0] = "export";
-	argumentsForExec[1] = varNameHold;
-	argumentsForExec[2] = NULL;
+	splitIndex = strchr(variableValue,'=');
+	variableName = malloc(sizeof(char) * strlen(argv[0]));
+	variableValue = malloc(sizeof(char) * (strlen(argv[0]) - splitIndex));
 
-	
-	pid = fork();
-	if(pid == 0) // If the child
+    strcpy(variableName,argv[0]);
+
+	int valueIndex = 0;
+	for(char i = splitIndex; variableName[i] != '\0'; ++i)
 	{
-
-		status = execvp(*argumentsForExec, argumentsForExec);
-
-		if(status < 0)
-		{
-			printf("%s", "Unable to call system command: " );
-			printf("%s\n", argv[0]);
-			exit(0);
-		}
+		variableValue[valueIndex] = variableName[i];
 	}
-	else
-	{
-		//In parent process, wait for child to finish.
-		if (waitpid(pid, &status, 0) < 0)
-			printf("%d %s", pid, "This was the unix error");
-		return;
-	} 
+
+	//split str by = 
+	split_str(variableName);
+
+	setenv(variableName,variableValue,1);
 
 	return;
 
-	/*
-	//Split the string before =
-	//set that to be the variable name to add to the environment
-	varNameHold = strtok(copy, "=");
-
-	if(!strcmp(token, varCopy))
-	{
-		printf("%s\n", stringHold);
-		return(1);
-	}		
-	//If the first value = the input envVar, print, else continue
-	i++; */
 }
 
 void remove_env_var(char ** argv)
 {
+	printf("%s\n", "called remove");
 	pid_t pid;
 	int status; 
 

@@ -61,7 +61,7 @@ void eval(char *cmdline)
 }
 
 /* If first arg is a builtin command, run it and return true */
-int builtin_command(char **argv) 
+int builtin_command(char ** argv) 
 {
     if (!strcmp(argv[0], "quit")) /* quit command */
     {
@@ -77,23 +77,24 @@ int builtin_command(char **argv)
         print_env(argv);
         return(1);
     }
-    //Split argv[1] based on =, if it contains it then the user is trying to 
-    //modify an environmental variable
-    else if (split_str(argv[0]))
+    //if the input contains =, then user trying to modify environmental var. 
+    else if ((strchr(argv[0],'=')))
     {
+        
         char * copyOfArgv; 
         char * cutArgv; 
-        strcpy(copyOfArgv, argv[0]);
 
-        
+        copyOfArgv = malloc(sizeof(char) * strlen(argv[0]));
+        strcpy(copyOfArgv,argv[0]);
+
         cutArgv = split_str(copyOfArgv);
         //If user trying to create an environmental variable. 
         int cutArgLength = strlen(&cutArgv);
-        int originalArgLength =  strlen(&argv[0]);
+        int originalArgLength =  strlen(&argv[0]); 
 
         //split the string by =, compare the lengths
         //if the string is varName=
-        if(!(cutArgLength + 1 == originalArgLength + 1))
+        if(!(copyOfArgv + 1 == originalArgLength + 1))
         {
             set_env_var(argv);
             return(1);
@@ -104,7 +105,6 @@ int builtin_command(char **argv)
             remove_env_var(argv);
             return(1);
         } 
-        printf("%s\n", "inside add / remove");
         return(1);
     }
     else if(!strcmp(argv[0], "echo"))
