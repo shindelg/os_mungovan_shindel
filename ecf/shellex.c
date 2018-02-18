@@ -143,6 +143,9 @@ int builtin_command(char ** argv)
         echo_var(argv);
         return(1);
     }
+    else{
+    	return 0;
+    }
 }
 /* $end eval */
 
