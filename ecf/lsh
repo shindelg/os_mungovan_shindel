@@ -1,0 +1,17 @@
+.\" Manpage for lsh.
+.\" Contact shindelg@lafayette.edu, mungoval@lafayette.edu
+.TH man 8 "17 February 2017" "1.0" "lsh man page"
+.SH NAME
+lsh \- Open lsh shell
+.SH SYNOPSIS
+LSH 
+.SH DESCRIPTION
+LSH is a shell which allows for BASH functionality with additional built-ins.
+.SH OPTIONS
+None
+.SH SEE ALSO
+None
+.SH BUGS
+NO KNOWN BUGS. 
+.SH AUTHOR
+Liam Mungovan, Greg Shindel
