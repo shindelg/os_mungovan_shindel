@@ -63,7 +63,7 @@ void modify_env_var(char ** argv)
 	{
 		setenv(variableName,variableValue,1);
 	}
-
+	
 	free(variableName);
 	free(variableValue);
 

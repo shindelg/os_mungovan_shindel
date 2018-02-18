@@ -74,10 +74,12 @@ void eval(char *cmdline)
 
 
     strcpy(buf, cmdline);
+    //if trying to pipe
+
     bg = parseline(buf, argv); 
     if (argv[0] == NULL)  
 	return;   /* Ignore empty lines */
-
+    
     if (!builtin_command(argv)) { 
         if ((pid = fork()) == 0) {   /* Child runs user job */
           if (execvp(*argv, argv) < 0) {     // run inheruted linux commands 
@@ -102,6 +104,7 @@ void eval(char *cmdline)
 /* If first arg is a builtin command, run it and return true */
 int builtin_command(char ** argv) 
 {
+
     if (!strcmp(argv[0], "quit")) /* quit command */
 		exit(0);  
 	else if (!strcmp(argv[0], "man")){
