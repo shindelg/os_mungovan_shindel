@@ -13,6 +13,13 @@ int parseline(char *buf, char **argv);
 int builtin_command(char **argv); 
 void signal_handler(int);
 
+struct job_t {
+    pid_t pid;              /* job PID */
+    int state;              /* UNDEF, BG, FG, or ST */
+    char cmdline[MAXLINE];  /* command line */
+};
+struct job_t jobs[128]; /* job list */
+
 int main() 
 {
     char cmdline[MAXLINE]; /* Command line */
