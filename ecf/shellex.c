@@ -5,6 +5,7 @@
 #include "man.c"
 #include "signal.h"
 
+#include "shellex.h"
 #define MAXARGS   128
 
 /* Function prototypes */
@@ -99,7 +100,7 @@ void eval(char *cmdline)
 }
 
 /* If first arg is a builtin command, run it and return true */
-int builtin_command(char **argv) 
+int builtin_command(char ** argv) 
 {
     if (!strcmp(argv[0], "quit")) /* quit command */
 		exit(0);  
@@ -126,8 +127,21 @@ int builtin_command(char **argv)
     else if (!strcmp(argv[0], "&")){
 		return 1;
 	}
-    else{
-    	return 0;                     /* Not a builtin command */
+    else if(!strcmp(argv[0], "printenv"))
+    {
+        print_env(argv);
+        return(1);
+    }
+    //if the input contains =, then user trying to modify environmental var. 
+    else if(strchr(argv[0],'='))
+    {   
+        modify_env_var(argv);
+        return(1);
+    }
+    else if(!strcmp(argv[0], "echo"))
+    {
+        echo_var(argv);
+        return(1);
     }
 }
 /* $end eval */

@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-#include "Fork.h"
+#include "environmentVar.h"
+#include "environmentVar.c"
+#include "fork.h"
 #include "../include/csapp.h"
 
 #define MAXLINE 8192 /*max text line length */ 
