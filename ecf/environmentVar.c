@@ -93,7 +93,7 @@ void echo_var(char ** argv)
 	}
 
     strcpy(variableName,argv[1]);
-    
+
     variableValue = getenv(variableName);
 
     if(variableValue)
@@ -107,18 +107,6 @@ void echo_var(char ** argv)
     	printf("%s", "Variable: ");
     	printf("%s", variableName);
     	printf("%s\n", " not found in environment.");
-    }
-
-    if(variableName != NULL)
-    {/*
-    	free(variableName);
-    	variableName = NULL;*/
-    }
-
-    if(variableValue != NULL)
-    {/*
-    	free(variableValue);
-    	variableValue = NULL;*/
     }
 
     return;
