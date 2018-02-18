@@ -17,7 +17,7 @@ int main()
 {
     char cmdline[MAXLINE]; /* Command line */
 
-	signal(SIGINT, INThandler);
+	signal(SIGINT, signal_handler);
 
     while (1) {
 	/* Read */
@@ -31,11 +31,24 @@ int main()
     } 
 }
 /* $end shellmain */
-  
+
+// get the last char of the last argv index to determine if it is a foreground or background 
+int fg_or_bg(char **argv){
+	return 0;
+}
+
+int pid_or_jid(char **argv){
+	return 0;
+}
+
 void  signal_handler(int sig)
 {
      signal(sig, SIG_IGN);
-     printf("OUCH, did you hit Ctrl-C?");
+     // kill foreground processes here
+     // kill(pid, SIGINT);
+     // then close
+     printf("OUCH, did you hit Ctrl-C?\n");
+     exit(0);
 }
 
 /* $begin eval */
@@ -47,6 +60,11 @@ void eval(char *cmdline)
     int bg;              /* Should the job run in bg or fg? */
     pid_t pid;           /* Process id */
     
+
+    /******************************** impliment % for JIDs */
+    /******************************** impliment & for backround jobs */
+
+
     strcpy(buf, cmdline);
     bg = parseline(buf, argv); 
     if (argv[0] == NULL)  
@@ -54,11 +72,6 @@ void eval(char *cmdline)
 
     if (!builtin_command(argv)) { 
         if ((pid = fork()) == 0) {   /* Child runs user job */
-    		/*
-            if (execve(argv[0], argv, environ) < 0) {
-                exit(0);
-            }
-            */
           if (execvp(*argv, argv) < 0) {     // run inheruted linux commands 
                printf("%s: Command not found.\n", argv[0]);
                exit(0);
@@ -77,25 +90,6 @@ void eval(char *cmdline)
     }
     return;
 }
-     /*
-     pid_t  pid;
-     int    status;
-     
-     if ((pid = fork()) < 0) {     // fork a child process           
-          printf("*** ERROR: forking child process failed\n");
-          exit(1);
-     }
-     else if (pid == 0) {          // for the child process:         
-          if (execvp(*argv, argv) < 0) {     // execute the command  
-               printf("*** ERROR: exec failed\n");
-               exit(1);
-          }
-     }
-     else {                                  // for the parent:      
-          while (wait(&status) != pid)       // wait for completion  
-               ;
-     }
-     */
 
 /* If first arg is a builtin command, run it and return true */
 int builtin_command(char **argv) 
@@ -106,6 +100,18 @@ int builtin_command(char **argv)
 		print_man();
 		return 1;
 	}
+	else if (!strcmp(argv[0], "jobs")){
+		// must list all background jobs
+		return 1;
+	}
+	else if (!strcmp(argv[0], "bg")){
+		// restarts given command by sending it SIGCONT and runs it in the background (either PID or JID)
+		return 1;
+	}
+	else if (!strcmp(argv[0], "fg")){
+		// restarts given command by sending it SIGCONT and runs it in the foreground (either PID or JID)
+		return 1;
+	}		
 	else if (!strcmp(argv[0], "stat")){
 		parse_stats(argv);
 		return 1;
