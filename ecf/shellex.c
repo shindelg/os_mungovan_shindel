@@ -71,6 +71,8 @@ void eval(char *cmdline)
 
 
     strcpy(buf, cmdline);
+    //if trying to pipe
+
     bg = parseline(buf, argv); 
     if (argv[0] == NULL)  
 	return;   /* Ignore empty lines */
@@ -127,6 +129,7 @@ int commitjob(struct job_t *joblist, pid_t pid, int jid, int state, char *cmdlin
 /* If first arg is a builtin command, run it and return true */
 int builtin_command(char ** argv) 
 {
+
     if (!strcmp(argv[0], "quit")) /* quit command */
 		exit(0);  
 	else if (!strcmp(argv[0], "jobs")){
@@ -193,6 +196,11 @@ int builtin_command(char ** argv)
     else if(!strcmp(argv[0], "echo"))
     {
         echo_var(argv);
+        return(1);
+    }
+    else if(findIndexOfPipe(argv))
+    {
+        makePipe(argv);
         return(1);
     }
     else{
