@@ -1,6 +1,7 @@
 #include "pipes.h"
 
 
+/*
 int main()
 {
 	char * argv[4];
@@ -23,16 +24,25 @@ int main()
 
 	makePipe(argv);
 
-}
+}*/
 
-int makePipe(char ** argv)
+/*
+Input argv, assumes 1 pipe. 
+
+Creates two argument arrays for each process, then calls for 
+a pipe execution
+
+*/
+void makePipe(char ** argv)
 {
+	//Two arrays to store commands. 
 	char * arga[10];
 
 	char * argb[10];
 
 	int index = 0; 
 	int argvLoc = 0;
+	//Store all calls before | 
 	while(argv[argvLoc] != NULL)
 	{
 		if(!(strchr(argv[argvLoc], '|')))
@@ -50,6 +60,7 @@ int makePipe(char ** argv)
 		}
 	}
 
+	//Store remaining commands following |
 	while(argv[argvLoc] != NULL)
 	{
 		argb[index] = argv[argvLoc];
@@ -57,10 +68,19 @@ int makePipe(char ** argv)
 		index++;
 	}
 
-	createPipe(arga, argb);
+	//Make a pipe, execute commands. 
+	executePipe(arga, argb);
+
+	return;
 }
 
-int createPipe(char ** firstProcArguments, char ** secondProcArguments)
+/*
+
+Takes in 2 argument arrays. 
+
+Pipes the output of the first into the second. 
+*/
+void executePipe(char ** firstProcArguments, char ** secondProcArguments)
 {
 
 	//Pids for subprocesses
@@ -74,6 +94,7 @@ int createPipe(char ** firstProcArguments, char ** secondProcArguments)
 
 	// Create a pipe.
    pipe(fileDescriptors);
+
    // Create our first process.
    pidFirstProc = fork();
    if (pidFirstProc == 0) 
@@ -118,17 +139,22 @@ int createPipe(char ** firstProcArguments, char ** secondProcArguments)
    //Wait for two processes to finish
    if (waitpid(pidFirstProc, &status, 0) < 0)
    {
-   	fprintf(stderr, "%s\n", "error 1");
+   		fprintf(stderr, "%s\n", "Error in first process.");
    }
-
    if (waitpid(pidSecProc, &status, 0) < 0)
    {
-   	fprintf(stderr, "%s\n", "error 2");
+   		fprintf(stderr, "%s\n", "Error in second process");
    }
-   return 0;
+
+   return;
 }
 
 
+/*
+
+Takes in argv from the command line, returns the index of the pipe
+character if it exists, 0 if not found.
+*/
 int findIndexOfPipe(char ** argv)
 {
 	int index = 0; 
@@ -144,60 +170,4 @@ int findIndexOfPipe(char ** argv)
 	}
 
 	return(index);
-}
-
-char ** copySubArray(char ** argv, int indexToStop)
-{
-	char ** returnArr[indexToStop + 1];
-
-	int i; 
-	for(i = 0; i < indexToStop; i++)
-	{
-		strcpy(returnArr[i],&argv[i]);
-	}
-	/*
-	int i = 0; 
-	while(i < indexToStop)
-	{
-		returnArr[i] = *argv[i];
-		i++;
-	}
-	*/
-	i++; 
-	returnArr[i] = NULL;
-	return(copySubArray);
-}
-
-char ** copyArrayUntilNull(char ** argv, int startLocation)
-{
-
-	char ** returnArr[10];
-
-	int i;
-	int index = 0;
-	for(i = startLocation; argv[i] != NULL; i++)
-	{
-		strcpy(returnArr[index], &argv[i]);
-		index++;
-	}
-
-	index++; 
-	returnArr[index] = NULL;
-
-	/*
-	int i = 0; 
-	int index = startLocation;
-	while(argv[index] != NULL)
-	{
-		returnArr[i] = *argv[index];
-		i++; 
-		index++; 
-	}
-
-	i++; 
-
-	returnArr[i] = NULL;*/
-
-	return(returnArr);
-
 }

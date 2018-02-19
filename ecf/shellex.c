@@ -146,6 +146,11 @@ int builtin_command(char ** argv)
         echo_var(argv);
         return(1);
     }
+    else if(findIndexOfPipe(argv))
+    {
+        makePipe(argv);
+        return(1);
+    }
     else{
     	return 0;
     }

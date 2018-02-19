@@ -7,14 +7,8 @@
 
 //Open a pipe
 
-int main();
+void executePipe(char ** firstProcArguments, char ** secondProcArguments);
 
-int createPipe(char ** firstProcArguments, char ** secondProcArguments);
-
-int makePipe(char ** argv);
+void makePipe(char ** argv);
 
 int findIndexOfPipe(char ** argv); 
-
-char ** copySubArray(char ** argv, int indexToStop);
-
-char ** copyArrayUntilNull(char ** argv, int startLocation);
