@@ -4,7 +4,7 @@
  * Usage: shell [-v]
  *    -v: verbose
  */
-#include "csapp.h"
+#include "../include/csapp.h"
 
 #define MAXARGS   128
 #define MAXJOBS    16
@@ -204,7 +204,7 @@ void waitfg(pid_t pid)
     
     /* wait for FG job to stop (WUNTRACED) or terminate */
     if (waitpid(pid, &status, WUNTRACED) < 0)
-	unix_error("waitfg: waitpid error");
+	//unix_error("waitfg: waitpid error");
     
     /* FG job has stopped. Change its state in jobs list */
     if (WIFSTOPPED(status)) {
@@ -252,12 +252,12 @@ int builtin_command(char **argv) {
 
 	if ((jobp = getjob(jobs, pid)) != NULL) {
 	    if (!strcmp(cmd, "bg")) {
-		Kill(pid, SIGCONT);
+		kill(pid, SIGCONT);
 		updatejob(jobs, pid, BG);
 		printf("%d %s", pid, jobs->cmdline);
 	    }
 	    if (!strcmp(cmd, "fg")) {
-		Kill(pid, SIGCONT);
+		kill(pid, SIGCONT);
 		updatejob(jobs, pid, FG);
 		waitfg(pid);
 	    }
@@ -313,7 +313,7 @@ void sigchld_handler(int sig)
      * still children left, but none of them are zombies (pid == 0).
      */
     if (!((pid == 0) || (pid == -1 && errno == ECHILD)))
-	unix_error("sigchld_handler wait error");
+	//unix_error("sigchld_handler wait error");
 
     if (verbose)
 	printf("sigchld_handler: exiting\n");
@@ -359,13 +359,13 @@ void eval(char *cmdline)
 
     if (!builtin_command(argv)) { 
 
-	if ((pid = Fork()) == 0) {  /* child */
+	if ((pid = fork()) == 0) {  /* child */
 
 	    /* Background jobs should ignore SIGINT (ctrl-c)  */
 	    /* and SIGTSTP (ctrl-z) */
 	    if (bg) {
-		Signal(SIGINT, SIG_IGN);
-		Signal(SIGTSTP, SIG_IGN);
+		signal(SIGINT, SIG_IGN);
+		signal(SIGTSTP, SIG_IGN);
 	    }
 
 	    if (execve(argv[0], argv, environ) < 0) {
@@ -407,9 +407,9 @@ int main(int argc, char **argv)
 	    usage();
     }
 
-    Signal(SIGINT, sigint_handler);   /* ctrl-c */
-    Signal(SIGCHLD, sigchld_handler); 
-    Signal(SIGTSTP, sigtstp_handler); /* ctrl-z */
+    signal(SIGINT, sigint_handler);   /* ctrl-c */
+    signal(SIGCHLD, sigchld_handler); 
+    signal(SIGTSTP, sigtstp_handler); /* ctrl-z */
 
     initjobs(jobs);
 
@@ -417,7 +417,7 @@ int main(int argc, char **argv)
     while (1) {
 	/* read command line */
 	printf("%s", prompt);                   
-	Fgets(cmdline, MAXLINE, stdin); 
+	fgets(cmdline, MAXLINE, stdin); 
 	if (feof(stdin))
 	    exit(0);
 

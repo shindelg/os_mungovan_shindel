@@ -63,29 +63,33 @@ void modify_env_var(char ** argv)
 	{
 		setenv(variableName,variableValue,1);
 	}
-
+	
 	free(variableName);
 	free(variableValue);
+
+	variableName = NULL;
+	variableValue = NULL;
+
 	return;
 
 }
 
 void echo_var(char ** argv)
 {
-	char * variableName;
+	char * variableName = NULL;
 
-	char * variableValue;
+	char * variableValue = NULL;
 
 	//If variable is $PWD, remove $
 	if(strchr(argv[1],'$'))
 	{
-		variableName = malloc(sizeof(char) * (strlen(argv[1] -1)));
+		variableName = malloc(strlen(argv[1]) + 1 );
 		argv[1]++;
 
 	}
 	else
 	{
-		variableName = malloc(sizeof(char) * strlen(argv[1]));
+		variableName = malloc(strlen(argv[1]) + 1);
 	}
 
     strcpy(variableName,argv[1]);
@@ -105,8 +109,6 @@ void echo_var(char ** argv)
     	printf("%s\n", " not found in environment.");
     }
 
-    free(variableName);
-    free(variableValue);
     return;
 } 
 

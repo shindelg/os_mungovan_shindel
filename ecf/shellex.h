@@ -5,6 +5,8 @@
 #include <string.h>
 #include "environmentVar.h"
 #include "environmentVar.c"
+#include "pipes.h"
+#include "pipes.c"
 #include "fork.h"
 #include "../include/csapp.h"
 

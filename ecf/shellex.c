@@ -1,5 +1,10 @@
 /* $begin shellmain */
 #include "../include/csapp.h"
+#include "stats.h"
+#include "stats.c"
+#include "man.c"
+#include "signal.h"
+
 #include "shellex.h"
 #define MAXARGS   128
 
@@ -7,10 +12,20 @@
 void eval(char *cmdline);
 int parseline(char *buf, char **argv);
 int builtin_command(char **argv); 
+void signal_handler(int);
+
+struct job_t {
+    pid_t pid;              /* job PID */
+    int state;              /* UNDEF, BG, FG, or ST */
+    char cmdline[MAXLINE];  /* command line */
+};
+struct job_t jobs[128]; /* job list */
 
 int main() 
 {
     char cmdline[MAXLINE]; /* Command line */
+
+	signal(SIGINT, signal_handler);
 
     while (1) {
 	/* Read */
@@ -24,7 +39,26 @@ int main()
     } 
 }
 /* $end shellmain */
-  
+
+// get the last char of the last argv index to determine if it is a foreground or background 
+int fg_or_bg(char **argv){
+	return 0;
+}
+
+int pid_or_jid(char **argv){
+	return 0;
+}
+
+void  signal_handler(int sig)
+{
+     signal(sig, SIG_IGN);
+     // kill foreground processes here
+     // kill(pid, SIGINT);
+     // then close
+     printf("OUCH, did you hit Ctrl-C?\n");
+     exit(0);
+}
+
 /* $begin eval */
 /* eval - Evaluate a command line */
 void eval(char *cmdline) 
@@ -34,17 +68,24 @@ void eval(char *cmdline)
     int bg;              /* Should the job run in bg or fg? */
     pid_t pid;           /* Process id */
     
+
+    /******************************** impliment % for JIDs */
+    /******************************** impliment & for backround jobs */
+
+
     strcpy(buf, cmdline);
+    //if trying to pipe
+
     bg = parseline(buf, argv); 
     if (argv[0] == NULL)  
 	return;   /* Ignore empty lines */
-
+    
     if (!builtin_command(argv)) { 
         if ((pid = fork()) == 0) {   /* Child runs user job */
-            if (execve(argv[0], argv, environ) < 0) {
-                printf("%s: Command not found.\n", argv[0]);
-                exit(0);
-            }
+          if (execvp(*argv, argv) < 0) {     // run inheruted linux commands 
+               printf("%s: Command not found.\n", argv[0]);
+               exit(0);
+          }    	
         }
 
 	/* Parent waits for foreground job to terminate */
@@ -63,14 +104,32 @@ void eval(char *cmdline)
 /* If first arg is a builtin command, run it and return true */
 int builtin_command(char ** argv) 
 {
+
     if (!strcmp(argv[0], "quit")) /* quit command */
-    {
-	   exit(0);  
-    }
-	else if (!strcmp(argv[0], "stat"))
-    {
+		exit(0);  
+	else if (!strcmp(argv[0], "man")){
+		print_man();
 		return 1;
-    }
+	}
+	else if (!strcmp(argv[0], "jobs")){
+		// must list all background jobs
+		return 1;
+	}
+	else if (!strcmp(argv[0], "bg")){
+		// restarts given command by sending it SIGCONT and runs it in the background (either PID or JID)
+		return 1;
+	}
+	else if (!strcmp(argv[0], "fg")){
+		// restarts given command by sending it SIGCONT and runs it in the foreground (either PID or JID)
+		return 1;
+	}		
+	else if (!strcmp(argv[0], "stat")){
+		parse_stats(argv);
+		return 1;
+	}
+    else if (!strcmp(argv[0], "&")){
+		return 1;
+	}
     else if(!strcmp(argv[0], "printenv"))
     {
         print_env(argv);
@@ -87,14 +146,14 @@ int builtin_command(char ** argv)
         echo_var(argv);
         return(1);
     }
-    else if (!strcmp(argv[0], "&"))    /* Ignore singleton & */
+    else if(findIndexOfPipe(argv))
     {
-	   return 1;
+        makePipe(argv);
+        return(1);
     }
-    else
-    {
-        return 0; /* Not a builtin command */
-    }                     
+    else{
+    	return 0;
+    }
 }
 /* $end eval */
 
@@ -131,5 +190,4 @@ int parseline(char *buf, char **argv)
     return bg;
 }
 /* $end parseline */
-
 
