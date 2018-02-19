@@ -1,31 +1,4 @@
 #include "pipes.h"
-
-
-/*
-int main()
-{
-	char * argv[4];
-
-	argv[0] = "ls";
-	argv[1] = "|";
-
-	argv[2] = "more";
-	argv[3] = NULL;
-
-	// char * argv[2];
-
-	// char * argc[2];
-
-	// argv[0] = "ls";
-	// argv[1] = NULL;
-
-	// argc[0] = "more";
-	// argc[1] = NULL;
-
-	makePipe(argv);
-
-}*/
-
 /*
 Input argv, assumes 1 pipe. 
 
