@@ -7,25 +7,32 @@
 
 #include "shellex.h"
 #define MAXARGS   128
+#define MAXJOBS	20
 
 /* Function prototypes */
 void eval(char *cmdline);
 int parseline(char *buf, char **argv);
-int builtin_command(char **argv); 
+int builtin_command(char **argv);
+int confirmjob(int pid); 
+int updatejobs(int pid, int status);
 void signal_handler(int);
+int jid = 1;
 
 struct job_t {
-    pid_t pid;              /* job PID */
-    int state;              /* UNDEF, BG, FG, or ST */
-    char cmdline[MAXLINE];  /* command line */
+    pid_t pid;
+    int jid;
+    int state;
+    char cmdline[MAXLINE];
 };
-struct job_t jobs[128]; /* job list */
+
+struct job_t joblist[MAXJOBS];
 
 int main() 
 {
     char cmdline[MAXLINE]; /* Command line */
 
 	signal(SIGINT, signal_handler);
+	signal(SIGTSTP, signal_handler);
 
     while (1) {
 	/* Read */
@@ -38,24 +45,17 @@ int main()
 	eval(cmdline);  // passes input to eval
     } 
 }
-/* $end shellmain */
-
-// get the last char of the last argv index to determine if it is a foreground or background 
-int fg_or_bg(char **argv){
-	return 0;
-}
-
-int pid_or_jid(char **argv){
-	return 0;
-}
 
 void  signal_handler(int sig)
 {
-     signal(sig, SIG_IGN);
-     // kill foreground processes here
-     // kill(pid, SIGINT);
-     // then close
-     printf("OUCH, did you hit Ctrl-C?\n");
+	if(sig == SIGTSTP){
+		//kill(pid, SIGTSTP);
+		printf("%s\n", "Did you hit ctrl+Z");
+	}
+	if(sig == SIGINT){
+		//kill(pid, SIGINT);
+		printf("%s\n", "Did you hit ctrl+C");		
+	}
      exit(0);
 }
 
@@ -66,11 +66,8 @@ void eval(char *cmdline)
     char *argv[MAXARGS]; /* Argument list execve() */
     char buf[MAXLINE];   /* Holds modified command line */
     int bg;              /* Should the job run in bg or fg? */
+    int arg_stat;		 /* BG/FG to be passed to the job */
     pid_t pid;           /* Process id */
-    
-
-    /******************************** impliment % for JIDs */
-    /******************************** impliment & for backround jobs */
 
 
     strcpy(buf, cmdline);
@@ -78,7 +75,7 @@ void eval(char *cmdline)
     if (argv[0] == NULL)  
 	return;   /* Ignore empty lines */
 
-    if (!builtin_command(argv)) { 
+    if (!builtin_command(argv)) { // runs if its a builting
         if ((pid = fork()) == 0) {   /* Child runs user job */
           if (execvp(*argv, argv) < 0) {     // run inheruted linux commands 
                printf("%s: Command not found.\n", argv[0]);
@@ -86,17 +83,45 @@ void eval(char *cmdline)
           }    	
         }
 
-	/* Parent waits for foreground job to terminate */
-	if (!bg) {
-	    int status;
-	    if (waitpid(pid, &status, 0) < 0)
-			printf("%d %s", pid, "This was the unix error");
-		//unix_error("waitfg: waitpid error");
-	}
-	else
-	    printf("%d %s", pid, cmdline);
-    }
+    	if(bg == 1){
+    	    arg_stat = 1;
+    	}
+   		else{
+        	arg_stat = 2;
+
+    	}    
+
+    	commitjob(joblist, pid, jid, arg_stat, cmdline); 
+
+		/* Parent waits for foreground job to terminate */
+		if (!bg) {
+	    	int status;
+	    	if (waitpid(pid, &status, 0) < 0)
+				printf("%d %s", pid, "This was the unix error");
+			//unix_error("waitfg: waitpid error");
+		}
+		else
+	    	printf("%d %s", pid, cmdline);
+		}
+	print_stats();
+	jid++;
+
     return;
+}
+
+int commitjob(struct job_t *joblist, pid_t pid, int jid, int state, char *cmdline){
+    int i;
+    
+    for (i = 0; i < MAXJOBS; i++) {
+		if (joblist[i].pid == 0) {
+	    	joblist[i].pid = pid;
+	    	joblist[i].jid = jid;
+	    	joblist[i].state = state;
+	    	strcpy(joblist[i].cmdline, cmdline);
+	    	return 1;
+		}
+    }
+    return 0;
 }
 
 /* If first arg is a builtin command, run it and return true */
@@ -104,35 +129,62 @@ int builtin_command(char ** argv)
 {
     if (!strcmp(argv[0], "quit")) /* quit command */
 		exit(0);  
-	else if (!strcmp(argv[0], "man")){
-		print_man();
-		return 1;
-	}
 	else if (!strcmp(argv[0], "jobs")){
-		// must list all background jobs
+		int i = 0;
+		for (i = 0; i < MAXJOBS; i++){
+			if(joblist[i].pid != 0){
+				printf("%5d", (int)joblist[i].pid);
+			}
+			if(joblist[i].jid != 0){
+				printf("%s %d", "	", joblist[i].jid);
+			}
+			if(joblist[i].state == 1){
+				printf("%s\n", ":	Foreground");
+			}
+			else if(joblist[i].state == 2){
+				printf("%s\n", ":	Background");
+			}
+			else if(joblist[i].state == 3){
+				printf("%s\n", ":	Stopped");
+			}
+		}
 		return 1;
 	}
-	else if (!strcmp(argv[0], "bg")){
-		// restarts given command by sending it SIGCONT and runs it in the background (either PID or JID)
+	else if (!strcmp(argv[0], "bg") && argv[1] != NULL){
+		int bg_pid;
+		bg_pid =  atoi(argv[1]);
+		if(confirmjob(bg_pid) == 1){
+			printf("%s\n", "command was sent to background.");
+			kill(bg_pid, SIGCONT);
+			updatejobs(bg_pid, 2);
+		}
+		else{
+			printf("%s\n", "The requested job does not exist.");
+		}		
 		return 1;
 	}
 	else if (!strcmp(argv[0], "fg")){
-		// restarts given command by sending it SIGCONT and runs it in the foreground (either PID or JID)
+		int fg_pid;
+		fg_pid = atoi(argv[1]);
+		if(confirmjob(fg_pid) == 1){
+			printf("%s\n", "command was sent to foreground.");
+			kill(fg_pid, SIGCONT);
+			updatejobs(fg_pid, 1);
+		}
+		else{
+			printf("%s\n", "The requested job does not exist.");
+		}
 		return 1;
 	}		
 	else if (!strcmp(argv[0], "stat")){
-		parse_stats(argv);
-		return 1;
-	}
-    else if (!strcmp(argv[0], "&")){
+		enable_stats(argv);
 		return 1;
 	}
     else if(!strcmp(argv[0], "printenv"))
     {
         print_env(argv);
         return(1);
-    }
-    //if the input contains =, then user trying to modify environmental var. 
+    } 
     else if(strchr(argv[0],'='))
     {   
         modify_env_var(argv);
@@ -182,4 +234,47 @@ int parseline(char *buf, char **argv)
     return bg;
 }
 /* $end parseline */
+
+int confirmjob(int pid){
+	int i;
+	for(int i = 0; i < MAXJOBS; i++){
+		if(joblist[i].pid == pid){
+			return 1; // what do I want to return here?
+		}
+		else{
+			return 0;
+		}
+	}
+	return 0;
+}
+
+int updatejobs(int pid, int status){
+	for(int i = 0; i < MAXJOBS; i++){
+		if(joblist[1].pid == pid){
+			joblist[i].state = status;
+			return 1;
+		}
+		else{
+			return 0;
+		}
+	}
+	return 0;
+}
+
+void killjobs(int pid, int sig){
+	int i;
+	for(int i = 0; i < MAXJOBS, i++){
+		
+	}
+}
+
+
+
+
+
+
+
+
+
+
 
