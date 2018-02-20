@@ -20,40 +20,58 @@ int enable_stats(char **argv){
 	int i = 1;
 	while(argv[i] != NULL){
 		
-
-		if (!strcmp(argv[i], "u")){
-			enableUT = 1;
-		}
-		if (!strcmp(argv[i], "s")){
- 			enableST = 1;
-		}
-		if (!strcmp(argv[i], "p")){
-			enablePF = 1;
-		}
-		if (!strcmp(argv[i], "v")){
-			enableVCS = 1;
-		}
-		if (!strcmp(argv[i], "i")){
-			enableICS = 1;			
-		}
-		// Do all of the stats
-		if (!strcmp(argv[i], "a")){
-			enableALL = 1;
-		}
-		// List enabled stats
-		if (!strcmp(argv[i], "l")){
-			
-		}
-		// clear all stats
-		if (!strcmp(argv[i], "c")){
-			enableUT = 0;
-			enableST = 0;
-			enablePF = 0;
-			enableVCS = 0;
-			enableICS = 0;
-			enableALL = 0;
-		}
-		i++;	
+		const char dash = '-';
+		const char u = 'u';
+		const char s = 's';
+		const char p = 'p';
+		const char v = 'v';
+		const char I = 'i';
+		const char a = 'a';
+		const char l = 'l';
+		const char c = 'c';
+		char *ret;
+		ret = strchr(argv[i], dash);
+		if (ret != NULL)
+		{
+			ret = strchr(argv[i], u);
+			if(ret != NULL){
+				enableUT = 1;
+			}
+			ret = strchr(argv[i], s);
+			if(ret != NULL){
+				enableST = 1;
+			}
+			ret = strchr(argv[i], p);
+			if(ret != NULL){
+				enablePF = 1;
+			}
+			ret = strchr(argv[i], v);
+			if(ret != NULL){
+				enableVCS = 1;
+			}
+			ret = strchr(argv[i], I);
+			if(ret != NULL){
+				enableICS = 1;
+			}
+			ret = strchr(argv[i], a);
+			if(ret != NULL){
+				enableALL = 1;
+			}
+			ret = strchr(argv[i], l);
+			if(ret != NULL){
+				
+			}
+			ret = strchr(argv[i], c);
+			if(ret != NULL){
+				enableUT = 0;
+				enableST = 0;
+				enablePF = 0;
+				enableVCS = 0;
+				enableICS = 0;
+				enableALL = 0;
+			}
+		}	
+		i++;
 	}
 	return(0);
 }

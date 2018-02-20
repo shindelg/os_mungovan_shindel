@@ -15,6 +15,8 @@ int parseline(char *buf, char **argv);
 int builtin_command(char **argv);
 int confirmjob(int pid); 
 int updatejobs(int pid, int status);
+void killjobs();
+void stopjobs();
 void signal_handler(int);
 int jid = 1;
 
@@ -46,17 +48,15 @@ int main()
     } 
 }
 
-void  signal_handler(int sig)
-{
+void signal_handler(int sig){
 	if(sig == SIGTSTP){
-		//kill(pid, SIGTSTP);
-		printf("%s\n", "Did you hit ctrl+Z");
+		stopjobs();
+		printf("%s\n", "Stop proceses");
 	}
 	if(sig == SIGINT){
-		//kill(pid, SIGINT);
-		printf("%s\n", "Did you hit ctrl+C");		
+		killjobs();
+		printf("%s\n", "Kill processes");		
 	}
-     exit(0);
 }
 
 /* $begin eval */
@@ -142,7 +142,7 @@ int builtin_command(char ** argv)
 				printf("%s %d", "	", joblist[i].jid);
 			}
 			if(joblist[i].state == 1){
-				printf("%s\n", ":	Foreground");
+				printf("%s\n", "%:	Foreground");
 			}
 			else if(joblist[i].state == 2){
 				printf("%s\n", ":	Background");
@@ -269,10 +269,21 @@ int updatejobs(int pid, int status){
 	return 0;
 }
 
-void killjobs(int pid, int sig){
+void stopjobs(){
 	int i;
-	for(int i = 0; i < MAXJOBS, i++){
-		
+	for(int i = 0; i < MAXJOBS; i++){
+		if(joblist[i].state == 1){
+			kill(joblist[i].pid, SIGTSTP);
+		}
+	}
+}
+
+void killjobs(){
+	int i;
+	for(int i = 0; i < MAXJOBS; i++){
+		if(joblist[i].state == 1){
+			kill(joblist[i].pid, SIGINT);
+		}
 	}
 }
 
